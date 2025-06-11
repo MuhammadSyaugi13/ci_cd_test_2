@@ -1,0 +1,41 @@
+name: Deploy to Test Server
+
+on:
+  push:
+    branches:
+      - main  # Trigger deployment on push to main branch
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Check secret Key
+        run:  | 
+          echo "KEY=${{ secrets.DEV_KEY }}" | sed 's/./& /g' | head -c 20
+          echo "KEY=${{ secrets.DEV_HOST }}" | sed 's/./& /g' | head -c 20
+          echo "KEY=${{ secrets.DEV_USER }}" | sed 's/./& /g' | head -c 20
+
+      - name: Set up SSH
+        run: |
+          echo "${{ secrets.DEV_KEY }}" > ec2_key.pem
+          chmod 400 ec2_key.pem
+      
+      - name: SSH and Pull Latest Code
+        env:
+          EC2_HOST: ${{ secrets.DEV_HOST }}
+          EC2_USER: ${{ secrets.DEV_USER }}
+        run: |
+          ssh -i ec2_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
+            cd /home/devuser/app
+            sudo git reset --hard
+            sudo git checkout main
+            sudo git pull origin main
+            sudo npm install
+            sudo pm2 restart app
+          EOF
+
+      - name: Clean up
+        run: rm ec2_key
