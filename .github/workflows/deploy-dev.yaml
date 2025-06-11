@@ -34,7 +34,7 @@ jobs:
             sudo git checkout main
             sudo git pull origin main
             sudo npm install
-            sudo pm2 restart /home/devuser/app/app.js
+            sudo pm2 start /home/devuser/app/app.js --name test-app-js
           EOF
 
       - name: Clean up
