@@ -38,4 +38,4 @@ jobs:
           EOF
 
       - name: Clean up
-        run: rm ec2_key
+        run: rm ec2_key.pem
