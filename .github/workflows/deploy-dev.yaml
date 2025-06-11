@@ -34,6 +34,8 @@ jobs:
             sudo git checkout main
             sudo git pull origin main
             sudo npm install
+            sudo pm2 stop --name test-app-js-2
+            sudo pm2 delete --name test-app-js-2
             sudo pm2 start /home/devuser/app/app.js --name test-app-js-2
           EOF
 
